@@ -129,7 +129,7 @@ if submitted and models_loaded_successfully:
     
     try:
         # Scale data if KNN or Linear Regression is selected (adjust based on your actual training pipeline)
-        if selected_model_name in ["KNN", "Linear Regression"]:
+        if selected_model_name in ["KNN"]:
             input_data_processed = knn_scaler.transform(input_data)
         else:
             input_data_processed = input_data
