@@ -17,7 +17,7 @@ app = FastAPI(
 # Allow requests from frontend (standard Next.js ports 3000, 3001, etc.)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For local development, allow all
+    allow_origins=["https://cargo-eta-one.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
