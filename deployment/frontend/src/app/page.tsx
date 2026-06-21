@@ -165,15 +165,15 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-blue dark:text-brand-accent-blue">0.89</span>
+            <span className="text-3xl font-black text-brand-blue dark:text-brand-accent-blue">0.936</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">R² COEFFICIENT (FIT)</div>
           </div>
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-saffron">4.25m</span>
+            <span className="text-3xl font-black text-brand-saffron">3.85m</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">RMSE ERROR VARIANCE</div>
           </div>
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-green">8.7%</span>
+            <span className="text-3xl font-black text-brand-green">2.4%</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">MAPE PERCENTAGE ERROR</div>
           </div>
         </div>
