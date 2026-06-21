@@ -11,9 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- NEW VERSION NOTICE ---
-st.info("📢 **Notice:** A new, improved version of this application is now available. For the most stable experience, we recommend using the updated version: [Click here to visit the New App](https://cargo-eta-one.vercel.app/)")
-
 # --- MODEL LOADING (CACHED) ---
 @st.cache_resource
 def load_models_and_scaler():
