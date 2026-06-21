@@ -266,16 +266,24 @@ export default function CommandCenterShell({ children }: { children: React.React
                 const Icon = item.icon;
                 
                 return (
-                  <Link 
+                  <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs transition-all ${
-                      isActive 
+                    className={`group relative flex items-center space-x-3 px-3 py-2 rounded-xl text-xs transition-all duration-300 ${
+                      isActive
                         ? "bg-brand-blue-light text-brand-blue dark:bg-brand-blue-light/10 dark:text-[#f97316] border-l-2 border-[#ea580c] font-bold" 
-                        : "text-slate-600 dark:text-slate-400 hover:text-text-primary hover:bg-slate-100 dark:hover:bg-brand-blue-light/5"
+                        : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white hover:bg-gradient-to-r hover:from-[#f97316]/20 hover:via-[#fb923c]/10 hover:to-transparent hover:border hover:border-[#f97316]/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] hover:translate-x-1"
                     }`}
                   >
-                    <Icon size={16} className={isActive ? "text-brand-saffron dark:text-[#f97316]" : "text-brand-blue dark:text-brand-accent-blue"} />
+                  <Icon
+                    size={16}
+                    className={`transition-all duration-300 ${
+                      isActive
+                        ? "text-[#f97316]"
+                        : "text-brand-accent-blue group-hover:text-[#fb923c] group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"
+                    }`}
+                  />
+
                     {sidebarOpen && <span className="tracking-wide">{item.name}</span>}
                   </Link>
                 );
