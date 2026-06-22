@@ -20,7 +20,7 @@ import {
 const FreightTrainScene = dynamic(
   () => import("@/components/3d/FreightTrainScene"),
   { ssr: false, loading: () => (
-    <div className="w-full h-[350px] bg-bg-card rounded-xl flex items-center justify-center border border-border-primary">
+    <div className="w-full h-full min-h-[500px] flex items-center justify-center">
       <div className="flex flex-col items-center space-y-3">
         <div className="w-10 h-10 border-4 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
         <span className="text-xs text-text-primary/60 font-semibold uppercase">Initializing 3D WebGL Engine...</span>
@@ -77,14 +77,14 @@ export default function LandingPage() {
           >
             <Link 
               href="/dashboard" 
-              className="px-6 py-2.5 rounded-lg font-bold text-xs bg-brand-blue hover:bg-brand-blue/90 text-white flex items-center space-x-2 border border-brand-blue shadow transition-all"
+              className="px-6 py-2.5 rounded-lg font-bold text-xs bg-brand-blue hover:bg-brand-blue/90 text-dark flex items-center space-x-2 border border-brand-blue shadow transition-all hover:dark:text-white"
             >
               <span>Launch Dashboard</span>
               <ArrowRight size={14} />
             </Link>
             <Link 
               href="/predict" 
-              className="px-6 py-2.5 rounded-lg font-bold text-xs bg-bg-card border border-border-primary hover:bg-slate-100 dark:hover:bg-brand-blue-light/5 text-text-primary transition-all"
+              className="px-6 py-2.5 rounded-lg font-bold text-xs bg-bg-card border border-border-primary hover:bg-slate-90 dark:hover:bg-brand-blue-light/5 text-text-primary transition-all"
             >
               Predict Delay Live
             </Link>
@@ -96,7 +96,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="lg:col-span-6 w-full"
+          className="lg:col-span-6 w-full h-full"
         >
           <FreightTrainScene />
         </motion.div>
@@ -107,7 +107,7 @@ export default function LandingPage() {
         {[
           { label: "TOTAL FREIGHT MOVED", value: "1.2B MT", change: "+12% YOY", status: "OPTIMAL", color: "text-brand-blue dark:text-brand-accent-blue" },
           { label: "LIVE TRANSIT CARGO", value: "14,282", change: "Active Trains", status: "ACTIVE", color: "text-[#ea580c] dark:text-[#f97316]" },
-          { label: "AI MODEL PRECISION", value: "98.4%", change: "LightGBM v4.2", status: "STABLE", color: "text-brand-green dark:text-brand-green" },
+          { label: "AI MODEL PRECISION", value: "93.0%", change: "LightGBM v2", status: "STABLE", color: "text-brand-green dark:text-brand-green" },
           { label: "CYBER GRID UPTIME", value: "99.99%", change: "ERA Cloud Sync", status: "ONLINE", color: "text-brand-blue dark:text-brand-accent-blue" }
         ].map((metric, i) => (
           <motion.div 
@@ -165,15 +165,15 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-blue dark:text-brand-accent-blue">0.89</span>
+            <span className="text-3xl font-black text-brand-blue dark:text-brand-accent-blue">0.93</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">R² COEFFICIENT (FIT)</div>
           </div>
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-saffron">4.25m</span>
+            <span className="text-3xl font-black text-brand-saffron">4.018m</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">RMSE ERROR VARIANCE</div>
           </div>
           <div className="p-4 bg-bg-primary border border-border-primary rounded">
-            <span className="text-3xl font-black text-brand-green">8.7%</span>
+            <span className="text-3xl font-black text-brand-green">3.2%</span>
             <div className="text-[10px] font-bold text-slate-500 mt-1">MAPE PERCENTAGE ERROR</div>
           </div>
         </div>
@@ -226,16 +226,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. TEAM AND DIVISIONAL INFORMATION */}
+      {/* 6. TEAM AND PROJECT INFORMATION */}
       <section className="border-t border-border-primary pt-12 pb-6 space-y-4">
         <h2 className="text-xs uppercase font-bold text-brand-saffron tracking-widest text-center">CREDENTIALS</h2>
-        <h3 className="text-xl font-bold text-text-primary text-center font-serif">Logistics Core Project Group</h3>
+        <h3 className="text-xl font-bold text-text-primary text-center font-serif">B.Tech CSE Project Team</h3>
         
         <div className="max-w-xl mx-auto p-4 rounded-lg bg-bg-card border border-border-primary text-center text-xs text-slate-600 dark:text-slate-400 leading-relaxed shadow-sm">
           <Award className="h-6 w-6 text-brand-saffron mx-auto mb-2" />
-          <p className="font-bold text-text-primary">EUROPEAN RAILWAY AGENCY (ERA) JOINT HUB</p>
-          <p className="text-[10px] mt-0.5 font-semibold">Joint Innovation Hub - Freight Logistics Operations division</p>
-          <p className="text-[10px] mt-2">Collaborative Engineering Group under European Union & EU Trans-European Transport Network (TEN-T) research initiatives.</p>
+          <p className="font-bold text-text-primary">CVR COLLEGE OF ENGINEERING</p>
+          <p className="text-[10px] mt-0.5 font-semibold">Department of Computer Science and Engineering</p>
+          <p className="text-[10px] mt-2">B.Tech III Year II Semester Minor Project. Developed by Gardas Akash, Donthula Harika, and Kasani Rishitha Srija under the supervision of Mr. D. Chaithanya.</p>
         </div>
       </section>
 

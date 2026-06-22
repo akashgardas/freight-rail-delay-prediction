@@ -102,7 +102,7 @@ export default function CommandCenterShell({ children }: { children: React.React
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary">
+    <div className="h-screen flex flex-col bg-bg-primary text-text-primary">
       
       {/* Dynamic line accent at the absolute top */}
       <div className="h-[4px] w-full bg-gradient-to-r from-brand-blue via-brand-accent-blue to-brand-blue shrink-0" />
@@ -132,7 +132,7 @@ export default function CommandCenterShell({ children }: { children: React.React
               </span>
             </div>
             <span className="text-[9px] text-slate-300 tracking-tight">
-              European Railway Agency & EU Joint Logistics Division
+              CVR College of Engineering • Dept of CSE
             </span>
           </div>
         </div>
@@ -242,23 +242,6 @@ export default function CommandCenterShell({ children }: { children: React.React
           
           <div className="py-4">
             
-            {/* Sidebar Branding block */}
-            {sidebarOpen ? (
-              <div className="px-4 mb-5 pb-4 border-b border-border-primary">
-                <div className="flex items-center space-x-2 text-xs font-bold text-text-primary">
-                  <ShieldCheck size={14} className="text-brand-saffron" />
-                  <span>SECURE TERMINAL</span>
-                </div>
-                <div className="text-[9px] text-slate-500 mt-0.5">
-                  USER ROLE: SECURE_OPERATOR_I
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-center mb-5">
-                <ShieldCheck size={16} className="text-brand-saffron" />
-              </div>
-            )}
-
             {/* Navigation links */}
             <nav className="space-y-1.5 px-2">
               {MENU_ITEMS.map((item) => {
@@ -266,16 +249,24 @@ export default function CommandCenterShell({ children }: { children: React.React
                 const Icon = item.icon;
                 
                 return (
-                  <Link 
+                  <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs transition-all ${
-                      isActive 
+                    className={`group relative flex items-center space-x-3 px-3 py-2 rounded-xl text-xs transition-all duration-300 ${
+                      isActive
                         ? "bg-brand-blue-light text-brand-blue dark:bg-brand-blue-light/10 dark:text-[#f97316] border-l-2 border-[#ea580c] font-bold" 
-                        : "text-slate-600 dark:text-slate-400 hover:text-text-primary hover:bg-slate-100 dark:hover:bg-brand-blue-light/5"
+                        : "text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white hover:bg-gradient-to-r hover:from-[#f97316]/20 hover:via-[#fb923c]/10 hover:to-transparent hover:border hover:border-[#f97316]/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.35)] hover:translate-x-1"
                     }`}
                   >
-                    <Icon size={16} className={isActive ? "text-brand-saffron dark:text-[#f97316]" : "text-brand-blue dark:text-brand-accent-blue"} />
+                  <Icon
+                    size={16}
+                    className={`transition-all duration-300 ${
+                      isActive
+                        ? "text-[#f97316]"
+                        : "text-brand-accent-blue group-hover:text-[#fb923c] group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"
+                    }`}
+                  />
+
                     {sidebarOpen && <span className="tracking-wide">{item.name}</span>}
                   </Link>
                 );
@@ -327,16 +318,16 @@ export default function CommandCenterShell({ children }: { children: React.React
                 <span className="font-bold text-slate-700 dark:text-slate-400 uppercase text-[11px] tracking-wide">
                   CARGOETA AI LOGISTICS ENGINE
                 </span>
-                <span className="text-[9px] mt-0.5 text-center md:text-left text-slate-500">
+                {/* <span className="text-[9px] mt-0.5 text-center md:text-left text-slate-500">
                   © 2026 European Railway Agency (ERA) & EU Joint Logistics Division. All Rights Reserved.
-                </span>
+                </span> */}
               </div>
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-slate-600 dark:text-slate-400">
-                <a href="#portal" className="hover:text-brand-blue transition-colors">ERA Logistics Portal</a>
+                <a href="#portal" className="hover:text-brand-blue transition-colors">CVR Portal</a>
                 <span className="text-slate-300 dark:text-slate-800">|</span>
-                <a href="#contact" className="hover:text-brand-blue transition-colors">Contact Admin</a>
+                <a href="#contact" className="hover:text-brand-blue transition-colors">Contact Team</a>
                 <span className="text-slate-300 dark:text-slate-800">|</span>
-                <a href="#safety" className="hover:text-brand-blue transition-colors">Safety Portal</a>
+                <a href="#safety" className="hover:text-brand-blue transition-colors">GitHub Repo</a>
               </div>
             </div>
           </footer>
