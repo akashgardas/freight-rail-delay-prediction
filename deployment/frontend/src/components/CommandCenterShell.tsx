@@ -102,7 +102,7 @@ export default function CommandCenterShell({ children }: { children: React.React
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary">
+    <div className="h-screen flex flex-col bg-bg-primary text-text-primary">
       
       {/* Dynamic line accent at the absolute top */}
       <div className="h-[4px] w-full bg-gradient-to-r from-brand-blue via-brand-accent-blue to-brand-blue shrink-0" />
@@ -132,7 +132,7 @@ export default function CommandCenterShell({ children }: { children: React.React
               </span>
             </div>
             <span className="text-[9px] text-slate-300 tracking-tight">
-              European Railway Agency & EU Joint Logistics Division
+              CVR College of Engineering • Dept of CSE
             </span>
           </div>
         </div>
@@ -242,23 +242,6 @@ export default function CommandCenterShell({ children }: { children: React.React
           
           <div className="py-4">
             
-            {/* Sidebar Branding block */}
-            {sidebarOpen ? (
-              <div className="px-4 mb-5 pb-4 border-b border-border-primary">
-                <div className="flex items-center space-x-2 text-xs font-bold text-text-primary">
-                  <ShieldCheck size={14} className="text-brand-saffron" />
-                  <span>SECURE TERMINAL</span>
-                </div>
-                <div className="text-[9px] text-slate-500 mt-0.5">
-                  USER ROLE: SECURE_OPERATOR_I
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-center mb-5">
-                <ShieldCheck size={16} className="text-brand-saffron" />
-              </div>
-            )}
-
             {/* Navigation links */}
             <nav className="space-y-1.5 px-2">
               {MENU_ITEMS.map((item) => {
@@ -335,16 +318,16 @@ export default function CommandCenterShell({ children }: { children: React.React
                 <span className="font-bold text-slate-700 dark:text-slate-400 uppercase text-[11px] tracking-wide">
                   CARGOETA AI LOGISTICS ENGINE
                 </span>
-                <span className="text-[9px] mt-0.5 text-center md:text-left text-slate-500">
+                {/* <span className="text-[9px] mt-0.5 text-center md:text-left text-slate-500">
                   © 2026 European Railway Agency (ERA) & EU Joint Logistics Division. All Rights Reserved.
-                </span>
+                </span> */}
               </div>
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-slate-600 dark:text-slate-400">
-                <a href="#portal" className="hover:text-brand-blue transition-colors">ERA Logistics Portal</a>
+                <a href="#portal" className="hover:text-brand-blue transition-colors">CVR Portal</a>
                 <span className="text-slate-300 dark:text-slate-800">|</span>
-                <a href="#contact" className="hover:text-brand-blue transition-colors">Contact Admin</a>
+                <a href="#contact" className="hover:text-brand-blue transition-colors">Contact Team</a>
                 <span className="text-slate-300 dark:text-slate-800">|</span>
-                <a href="#safety" className="hover:text-brand-blue transition-colors">Safety Portal</a>
+                <a href="#safety" className="hover:text-brand-blue transition-colors">GitHub Repo</a>
               </div>
             </div>
           </footer>
