@@ -548,10 +548,14 @@ export default function FreightTrainScene() {
     <div className="w-full h-full min-h-[500px] relative">
       <Canvas
         className="absolute inset-0"
-        camera={{
-        position: [8, 3, 35],
-        fov: 45,
-      }}
+      //   camera={{
+      //   position: [8, 3, 35],
+      //   fov: 45,
+      // }}
+      camera={{
+      position: [-25, 5, 45],
+      fov: 40,
+    }}
               shadows
       >
         {/* Transparent background by default in R3F when no color is attached */}
