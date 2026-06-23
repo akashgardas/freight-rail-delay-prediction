@@ -80,6 +80,8 @@ export default function DelayPredictionPage() {
 
     // Call FastAPI backend
     try {
+      // Testing
+      console.log(formData);
       const response = await fetch(`${API_BASE_URL}/predict`, {
         method: "POST",
         headers: {
