@@ -30,7 +30,7 @@ class PredictionInput(BaseModel):
     wagon_count: int = Field(..., ge=5, le=150, description="Number of wagons in the freight train")
     weight_per_wagon: float = Field(..., description="Average weight per wagon in tonnes")
     weight_per_length: float = Field(..., description="Weight per length in tonnes/meter")
-    trip_distance: float = Field(..., ge=10.0, le=3000.0, description="Trip distance in kilometers")
+    trip_distance: float = Field(..., ge=99.0, le=3000.0, description="Trip distance in kilometers")
     previous_delay: float = Field(..., ge=0.0, le=600.0, description="Delay at previous checkpoint in minutes")
     departure_delay: float = Field(..., ge=0.0, le=600.0, description="Departure delay in minutes")
     route_name: str = Field("Berlin - Warsaw", description="Name of the freight corridor")
