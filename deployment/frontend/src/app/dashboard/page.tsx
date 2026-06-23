@@ -24,7 +24,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Mock data fallbacks matching the FastAPI responses
 const DEFAULT_METRICS = {
