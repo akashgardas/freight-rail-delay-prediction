@@ -37,6 +37,7 @@ export default function DelayPredictionPage() {
     previous_delay: 15,
     departure_delay: 20,
     route_name: "Berlin - Paris Corridor",
+    model_selection: "LGBM",
   });
 
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ export default function DelayPredictionPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "route_name" ? value : Number(value),
+      [name]: ["route_name", "model_selection"].includes(name) ? value : Number(value),
     }));
   };
 
@@ -160,6 +161,7 @@ export default function DelayPredictionPage() {
           contributions,
           timestamp: new Date().toLocaleTimeString(),
           inputs: formData,
+          model_used: formData.model_selection,
         });
       }, 800); // Mock network latency
     } finally {
@@ -353,6 +355,25 @@ export default function DelayPredictionPage() {
             </select>
           </div>
 
+          {/* Model Selector */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-500 uppercase">
+              AI Prediction Model
+            </label>
+            <select
+              name="model_selection"
+              value={formData.model_selection}
+              onChange={handleChange}
+              className="w-full bg-bg-primary border border-border-primary rounded p-2 text-xs text-text-primary focus:outline-none focus:border-brand-blue dark:focus:border-brand-accent-blue transition-colors"
+            >
+              <option value="LGBM">LGBM</option>
+              <option value="LR">Linear Regression</option>
+              <option value="RF">Random Forest</option>
+              <option value="KNN">K-Nearest Neighbors</option>
+              <option value="LSTM">LSTM Neural Network</option>
+            </select>
+          </div>
+
           {/* Predict button with premium AI glow */}
           <button
             type="submit"
@@ -397,7 +418,7 @@ export default function DelayPredictionPage() {
               <div className="flex justify-between items-center border-b border-border-primary pb-3">
                 <span className="text-[10px] font-bold text-brand-saffron flex items-center gap-1.5">
                   <ShieldCheck size={12} />
-                  <span>AI MODEL OUTPUT VERIFIED</span>
+                  <span>{predictionResult.model_used || "AI MODEL"} OUTPUT VERIFIED</span>
                 </span>
                 <span className="text-[9px] text-slate-500">
                   {predictionResult.timestamp}
