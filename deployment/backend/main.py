@@ -17,7 +17,11 @@ app = FastAPI(
 # Allow requests from frontend (standard Next.js ports 3000, 3001, etc.)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://cargo-eta-one.vercel.app"],
+    allow_origins=[
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://cargo-eta-one.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +38,7 @@ class PredictionInput(BaseModel):
     previous_delay: float = Field(..., ge=0.0, le=600.0, description="Delay at previous checkpoint in minutes")
     departure_delay: float = Field(..., ge=0.0, le=600.0, description="Departure delay in minutes")
     route_name: str = Field("Berlin - Warsaw", description="Name of the freight corridor")
+    model_selection: str = Field("LGBM", description="Model selected for inference")
 
 class PredictionResponse(BaseModel):
     predicted_delay: float
@@ -44,6 +49,7 @@ class PredictionResponse(BaseModel):
     global_importance: Dict[str, float]
     inputs: Dict[str, float]
     timestamp: str
+    model_used: str
 
 @app.get("/health")
 def health_check():
@@ -112,15 +118,17 @@ def get_analytics_summary():
         {"from": "paris", "to": "madrid", "active_trains": 3, "avg_speed": 105, "status": "OPTIMAL"}
     ]
     
-    # Performance metric statistics (R2, RMSE, MAPE)
+    # Performance metric statistics dynamically computed from test data (if available)
+    real_metrics = model_handler.get_evaluation_metrics()
+    
     metrics = {
         "total_predictions": 124802,
         "avg_delay_reduction_mins": 14.8,
         "punctuality_rate": 92.4,
         "delay_variance_mins": 2.1,
-        "rmse": 4.25,
-        "r2_score": 0.89,
-        "mape": 8.7,  # Mean Absolute Percentage Error
+        "rmse": real_metrics["rmse"],
+        "r2_score": real_metrics["r2_score"],
+        "mape": real_metrics["mape"],
         "network_efficiency_index": 88.5
     }
     
