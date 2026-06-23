@@ -2,7 +2,6 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
 
 # Attempt imports with fallback logic for local systems lacking C++ compiler libraries
 HAS_LGBM = False
@@ -20,7 +19,6 @@ except ImportError:
     print("Warning: shap not found. Falling back to analytical feature contributions.")
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
-MODEL_PATH = os.path.join(MODEL_DIR, "cargo_eta_model.joblib")
 
 # Feature list used by the model
 FEATURE_NAMES = [
@@ -46,9 +44,25 @@ FEATURE_MEANS = {
     "departure_delay": 20.0      # minutes
 }
 
+class DummyLSTM:
+    """
+    A placeholder for the user's actual Keras/PyTorch LSTM.
+    Wraps an MLPRegressor to simulate Neural Network predictions
+    so the dashboard functions correctly out of the box.
+    """
+    def __init__(self):
+        from sklearn.neural_network import MLPRegressor
+        self.model = MLPRegressor(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)
+    
+    def fit(self, X, y):
+        self.model.fit(X, y)
+        
+    def predict(self, X):
+        return self.model.predict(X)
+
 class CargoETAModelHandler:
     def __init__(self):
-        self.model = None
+        self.models = {}
         self.explainer = None
         self.base_value = 12.5  # Historical average arrival delay
         self.load_or_train_model()
@@ -56,19 +70,31 @@ class CargoETAModelHandler:
     def load_or_train_model(self):
         os.makedirs(MODEL_DIR, exist_ok=True)
         
-        if os.path.exists(MODEL_PATH):
+        lgbm_path = os.path.join(MODEL_DIR, "cargo_eta_lgbm.joblib")
+        lr_path = os.path.join(MODEL_DIR, "cargo_eta_lr.joblib")
+        rf_path = os.path.join(MODEL_DIR, "cargo_eta_rf.joblib")
+        knn_path = os.path.join(MODEL_DIR, "cargo_eta_knn.joblib")
+        lstm_path = os.path.join(MODEL_DIR, "cargo_eta_lstm.joblib")
+        
+        all_exist = all(os.path.exists(p) for p in [lgbm_path, lr_path, rf_path, knn_path, lstm_path])
+        
+        if all_exist:
             try:
-                self.model = joblib.load(MODEL_PATH)
-                print("Successfully loaded pre-trained model from disk.")
+                self.models["LGBM"] = joblib.load(lgbm_path)
+                self.models["LR"] = joblib.load(lr_path)
+                self.models["RF"] = joblib.load(rf_path)
+                self.models["KNN"] = joblib.load(knn_path)
+                self.models["LSTM"] = joblib.load(lstm_path)
+                print("Successfully loaded all pre-trained models from disk.")
                 self.init_explainer()
                 return
             except Exception as e:
-                print(f"Error loading model: {e}. Re-training model...")
+                print(f"Error loading models: {e}. Re-training models...")
 
-        self.train_default_model()
+        self.train_default_models()
 
-    def train_default_model(self):
-        print("Training a default model on synthetic freight logistics data...")
+    def train_default_models(self):
+        print("Training default models on synthetic freight logistics data...")
         np.random.seed(42)
         n_samples = 2000
         
@@ -94,7 +120,6 @@ class CargoETAModelHandler:
         })
         
         # Underlying delay generation rule (target variable with some noise)
-        # arrival delay increases with higher departure delay, previous delay, heavier trains, longer distance
         y = (
             0.45 * departure_delay +
             0.25 * previous_delay +
@@ -103,32 +128,62 @@ class CargoETAModelHandler:
             0.005 * train_length +
             np.random.normal(0, 5, n_samples)
         )
-        # Delay cannot be less than zero
         y = np.clip(y, 0, None)
         
+        from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
+        from sklearn.neighbors import KNeighborsRegressor
+        from sklearn.preprocessing import StandardScaler
+        
+        # Scale X for KNN and LSTM (MLP)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        joblib.dump(scaler, os.path.join(MODEL_DIR, "scaler.joblib"))
+        
+        # 1. LGBM
         if HAS_LGBM:
-            self.model = lgb.LGBMRegressor(
-                n_estimators=100,
-                learning_rate=0.05,
-                num_leaves=31,
-                random_state=42,
-                verbose=-1
-            )
-            self.model.fit(X, y)
+            lgb_model = lgb.LGBMRegressor(n_estimators=100, learning_rate=0.05, num_leaves=31, random_state=42, verbose=-1)
+            lgb_model.fit(X, y)
+            self.models["LGBM"] = lgb_model
         else:
-            from sklearn.ensemble import RandomForestRegressor
-            self.model = RandomForestRegressor(n_estimators=50, max_depth=8, random_state=42)
-            self.model.fit(X, y)
+            rf_fallback = RandomForestRegressor(n_estimators=50, max_depth=8, random_state=42)
+            rf_fallback.fit(X, y)
+            self.models["LGBM"] = rf_fallback
             
-        joblib.dump(self.model, MODEL_PATH)
-        print(f"Model trained successfully and saved to {MODEL_PATH}")
+        # 2. LR
+        lr_model = LinearRegression()
+        lr_model.fit(X, y)
+        self.models["LR"] = lr_model
+        
+        # 3. RF
+        rf_model = RandomForestRegressor(n_estimators=50, max_depth=8, random_state=123)
+        rf_model.fit(X, y)
+        self.models["RF"] = rf_model
+        
+        # 4. KNN
+        knn_model = KNeighborsRegressor(n_neighbors=5)
+        knn_model.fit(X_scaled, y)
+        self.models["KNN"] = knn_model
+        
+        # 5. LSTM (Placeholder)
+        lstm_model = DummyLSTM()
+        lstm_model.fit(X_scaled, y)
+        self.models["LSTM"] = lstm_model
+            
+        joblib.dump(self.models["LGBM"], os.path.join(MODEL_DIR, "cargo_eta_lgbm.joblib"))
+        joblib.dump(self.models["LR"], os.path.join(MODEL_DIR, "cargo_eta_lr.joblib"))
+        joblib.dump(self.models["RF"], os.path.join(MODEL_DIR, "cargo_eta_rf.joblib"))
+        joblib.dump(self.models["KNN"], os.path.join(MODEL_DIR, "cargo_eta_knn.joblib"))
+        joblib.dump(self.models["LSTM"], os.path.join(MODEL_DIR, "cargo_eta_lstm.joblib"))
+        
+        print("All models trained successfully and saved.")
         self.init_explainer()
 
     def init_explainer(self):
-        if HAS_SHAP and self.model is not None:
+        model_to_explain = self.models.get("LGBM") or self.models.get("RF")
+        if HAS_SHAP and model_to_explain is not None:
             try:
-                # TreeExplainer works for both LightGBM and RandomForest
-                self.explainer = shap.TreeExplainer(self.model)
+                self.explainer = shap.TreeExplainer(model_to_explain)
                 print("SHAP TreeExplainer initialized successfully.")
             except Exception as e:
                 print(f"Failed to initialize SHAP TreeExplainer: {e}. Using analytical explainability.")
@@ -136,12 +191,11 @@ class CargoETAModelHandler:
 
     def predict(self, input_data: dict) -> dict:
         """
-        Receives a dictionary of input features, returns:
-        - predicted_delay (mins)
-        - confidence_score (%)
-        - severity (Low / Medium / High)
-        - shap_values (dictionary of feature contribution percentages)
+        Receives a dictionary of input features, returns prediction details.
         """
+        model_selection = input_data.get("model_selection", "LGBM")
+        selected_model = self.models.get(model_selection)
+        
         # Ensure correct key structure
         row_dict = {}
         for key in FEATURE_NAMES:
@@ -149,9 +203,19 @@ class CargoETAModelHandler:
             
         df = pd.DataFrame([row_dict])
         
+        # Check if we need to scale inputs for KNN or LSTM
+        try:
+            scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.joblib"))
+            df_scaled = scaler.transform(df)
+        except:
+            df_scaled = df
+        
         # Make prediction
-        if self.model is not None:
-            pred_raw = float(self.model.predict(df)[0])
+        if selected_model is not None:
+            if model_selection in ["KNN", "LSTM"]:
+                pred_raw = float(selected_model.predict(df_scaled)[0])
+            else:
+                pred_raw = float(selected_model.predict(df)[0])
         else:
             # Hard fallback calculation
             pred_raw = (
@@ -191,7 +255,7 @@ class CargoETAModelHandler:
         
         # Calculate SHAP values / feature contributions
         shap_contribs = {}
-        if HAS_SHAP and self.explainer is not None:
+        if HAS_SHAP and self.explainer is not None and model_selection in ["LGBM", "RF"]:
             try:
                 # Calculate SHAP values
                 shap_res = self.explainer.shap_values(df)
@@ -211,10 +275,8 @@ class CargoETAModelHandler:
         else:
             shap_contribs = self._calculate_analytical_shap(row_dict, predicted_delay)
             
-        # Ensure the sum of shap contributions is close to the difference from base value
         actual_total_diff = predicted_delay - self.base_value
         
-        # Format SHAP contribution details
         contributions = []
         for feat in FEATURE_NAMES:
             val = shap_contribs.get(feat, 0.0)
@@ -227,10 +289,9 @@ class CargoETAModelHandler:
         # Sort features by absolute contribution (SHAP Feature Importance)
         contributions = sorted(contributions, key=lambda x: x["importance"], reverse=True)
         
-        # Retrieve overall feature importance from model
         global_importance = {}
-        if self.model is not None and hasattr(self.model, "feature_importances_"):
-            importances = self.model.feature_importances_
+        if selected_model is not None and hasattr(selected_model, "feature_importances_"):
+            importances = selected_model.feature_importances_
             total_imp = sum(importances)
             for idx, feat in enumerate(FEATURE_NAMES):
                 global_importance[feat] = float(importances[idx] / total_imp)
@@ -255,7 +316,8 @@ class CargoETAModelHandler:
             "base_value": self.base_value,
             "contributions": contributions,
             "global_importance": global_importance,
-            "inputs": row_dict
+            "inputs": row_dict,
+            "model_used": model_selection
         }
 
     def _calculate_analytical_shap(self, row_dict: dict, predicted_delay: float) -> dict:
@@ -317,17 +379,19 @@ class CargoETAModelHandler:
         Dynamically calculates model evaluation metrics using saved test data.
         If test data isn't available, returns the fallback default metrics.
         """
+        from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
         try:
             # 1. Load the saved test data
             X_test = pd.read_csv(os.path.join(MODEL_DIR, "X_test.csv"))
             y_test = pd.read_csv(os.path.join(MODEL_DIR, "y_test.csv"))
 
-            # Ensure model exists before predicting
-            if self.model is None:
-                raise ValueError("Model is not loaded.")
+            # Default to LGBM for the dashboard metrics
+            model = self.models.get("LGBM")
+            if model is None:
+                raise ValueError("LGBM Model is not loaded.")
 
             # 2. Predict using the loaded model
-            y_pred = self.model.predict(X_test)
+            y_pred = model.predict(X_test)
 
             # 3. Calculate metrics
             rmse = np.sqrt(mean_squared_error(y_test, y_pred))
@@ -340,8 +404,7 @@ class CargoETAModelHandler:
                 "mape": round(float(mape), 2)
             }
         except Exception as e:
-            print(f"Notice: Could not calculate dynamic metrics ({e}). Returning defaults. Ensure X_test.csv and y_test.csv exist in the model directory.")
-            # Fallback to defaults if files are missing or model fails
+            print(f"Notice: Could not calculate dynamic metrics ({e}). Returning defaults.")
             return {"rmse": 4.25, "r2_score": 0.89, "mape": 8.7}
 
 # Singleton instance for loading model once
